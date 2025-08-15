@@ -4,16 +4,18 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/themeToggle";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Navbar() {
   const router = useRouter();
   const { data: session } = authClient.useSession();
 
   const signOut = async () => {
-    await authClient.signOut({
+    authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.push("/login"); // redirect to login page
+          router.push("/"); // redirect to login page
+          toast.success("Logged Out");
         },
       },
     });

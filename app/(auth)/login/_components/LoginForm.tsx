@@ -9,17 +9,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { GithubIcon, Loader } from "lucide-react";
+import { GithubIcon, Loader, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 export function LoginForm() {
-  const [isPending, startTransition] = useTransition();
+  const [isPendingGithub, startTransitionGithub] = useTransition();
+  const [isPendingOtp, startTransitionOtp] = useTransition();
+  const [email, setEmail] = useState("");
+  const router = useRouter();
 
   async function signInWithGithub() {
-    startTransition(async () => {
+    startTransitionGithub(async () => {
       await authClient.signIn.social({
         provider: "github",
         callbackURL: "/",
@@ -34,6 +38,24 @@ export function LoginForm() {
       });
     });
   }
+  function signInWithEmailOTP() {
+    startTransitionOtp(async () => {
+      await authClient.emailOtp.sendVerificationOtp({
+        email: email, // required
+        type: "sign-in",
+        fetchOptions: {
+          onSuccess: () => {
+            toast.success(`Otp send on ${email}`);
+            router.push(`/verify-email?email=${email}`);
+          },
+          onError: (err) => {
+            toast.error(`Please check email`);
+            console.log(err.error);
+          },
+        },
+      });
+    });
+  }
   return (
     <Card>
       <CardHeader>
@@ -42,12 +64,12 @@ export function LoginForm() {
       </CardHeader>
       <CardContent className="flex flex-col justify-center gap-6">
         <Button
-          disabled={isPending}
+          disabled={isPendingGithub}
           onClick={signInWithGithub}
           className="w-full"
           variant="outline"
         >
-          {isPending ? (
+          {isPendingGithub ? (
             <>
               <Loader className="size-4 animate-spin" />{" "}
               <span>Signing in with github</span>
@@ -74,9 +96,22 @@ export function LoginForm() {
               type="email"
               name="email"
               id="email"
+              required
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
             />
           </div>
-          <Button>Continue with Email</Button>
+          <Button disabled={isPendingOtp} onClick={signInWithEmailOTP}>
+            {isPendingOtp ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                <span>Sending OTP...</span>
+              </>
+            ) : (
+              <>Continue with Email</>
+            )}
+          </Button>
         </div>
       </CardContent>
     </Card>
