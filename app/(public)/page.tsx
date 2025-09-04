@@ -73,7 +73,7 @@ export default function Home() {
           </p>
           <div className="flex gap-2">
             <Link
-              href="/cources"
+              href="admin/courses"
               className={buttonVariants({
                 size: "lg",
               })}

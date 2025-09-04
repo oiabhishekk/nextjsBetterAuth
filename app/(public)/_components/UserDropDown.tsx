@@ -36,8 +36,7 @@ interface User {
 }
 
 export function UserDropDown({ userData }: { userData: User }) {
-
-  const handleLogout = useSignOut()
+  const handleLogout = useSignOut();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -77,7 +76,7 @@ export function UserDropDown({ userData }: { userData: User }) {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href={"/courses"}>
+            <Link href={"admin/courses"}>
               <BookOpen size={16} className="opacity-60" aria-hidden="true" />
               <span>Courses</span>
             </Link>

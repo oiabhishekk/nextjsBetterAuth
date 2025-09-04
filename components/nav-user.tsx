@@ -27,6 +27,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import useSignOut from "@/hooks/use-signOut";
+import { Tv2 } from "lucide-react";
 
 export function NavUser() {
   const handleLogout = useSignOut();
@@ -102,14 +103,10 @@ export function NavUser() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/admin/cources">
-                  <IconCreditCard />
-                  Cources
+                <Link href="/admin/courses">
+                  <Tv2 />
+                  Courses
                 </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconNotification />
-                Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

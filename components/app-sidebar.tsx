@@ -34,7 +34,6 @@ import {
 } from "@/components/ui/sidebar";
 
 const data = {
-  
   navMain: [
     {
       title: "Dashboard",
@@ -42,8 +41,8 @@ const data = {
       icon: IconDashboard,
     },
     {
-      title: "Cources",
-      url: "/cources",
+      title: "Courses",
+      url: "/admin/courses",
       icon: IconListDetails,
     },
     {
