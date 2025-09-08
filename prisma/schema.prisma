@@ -29,6 +29,7 @@ model User {
   updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
+  courses       Course[]
 
   @@unique([email])
   @@map("user")
@@ -77,4 +78,35 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model Course {
+  id               String   @id @default(uuid())
+  title            String
+  description      String
+  smallDescription String   @map("small_description")
+  fileKey          String   @map("file_key") // S3 file key
+  price            Float
+  duration         Int // duration in minutes or hours
+  level            Level    @default(BEGINNER)
+  status           Status   @default(DRAFT)
+  category         String
+  slug             String   @unique @map("category_slug")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+}
+
+enum Level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum Status {
+  DRAFT
+  PUBLIC
+  ARCHIVE
 }
