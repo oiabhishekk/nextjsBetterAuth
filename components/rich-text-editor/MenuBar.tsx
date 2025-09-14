@@ -1,64 +1,29 @@
 "use client";
 
-import { Editor } from "@tiptap/react";
+import { type Editor } from "@tiptap/react";
 import {
   Bold,
   Italic,
   Strikethrough,
   Heading1,
   Heading2,
+  Heading3,
   List,
   ListOrdered,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Toggle } from "@/components/ui/toggle";
 import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
-import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
 type MenuBarProps = {
   editor: Editor | null;
 };
 
 export function MenuBar({ editor }: MenuBarProps) {
-  const [active, setActive] = useState({
-    bold: false,
-    italic: false,
-    strike: false,
-    h1: false,
-    h2: false,
-    bulletList: false,
-    orderedList: false,
-  });
-  useEffect(() => {
-    if (!editor) return;
-
-    const update = () => {
-      console.log("active.bold");
-      console.log(active.bold);
-      setActive({
-        bold: editor.isActive("bold"),
-        italic: editor.isActive("italic"),
-        strike: editor.isActive("strike"),
-        h1: editor.isActive("heading", { level: 1 }),
-        h2: editor.isActive("heading", { level: 2 }),
-        bulletList: editor.isActive("bulletList"),
-        orderedList: editor.isActive("orderedList"),
-      });
-    };
-
-    update();
-    editor.on("update", update);
-    editor.on("selectionUpdate", update);
-
-    return () => {
-      editor.off("update", update);
-      editor.off("selectionUpdate", update);
-    };
-  }, [editor]);
-
   if (!editor) return null;
 
   return (
@@ -66,17 +31,19 @@ export function MenuBar({ editor }: MenuBarProps) {
       {/* Bold */}
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            type="button"
+          <Toggle
             size="sm"
-            variant={active.bold ? "default" : "outline"}
-            onClick={() => {
-              console.log(editor.isActive("bold"));
-              editor.chain().focus().toggleBold().run();
-            }}
+            pressed={editor.isActive("bold")}
+            onPressedChange={() => editor.chain().focus().toggleBold().run()}
+            className={cn(
+              "rounded-sm p-1 transition ",
+              editor.isActive("bold")
+                ? "bg-black text-muted-foreground"
+                : "hover:bg-sidebar"
+            )}
           >
             <Bold size={16} />
-          </Button>
+          </Toggle>
         </TooltipTrigger>
         <TooltipContent>Bold</TooltipContent>
       </Tooltip>
@@ -84,14 +51,19 @@ export function MenuBar({ editor }: MenuBarProps) {
       {/* Italic */}
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            type="button"
+          <Toggle
             size="sm"
-            variant={active.italic ? "default" : "outline"}
-            onClick={() => editor.chain().focus().toggleItalic().run()}
+            pressed={editor.isActive("italic")}
+            onPressedChange={() => editor.chain().focus().toggleItalic().run()}
+            className={cn(
+              "rounded-sm p-1 transition",
+              editor.isActive("italic")
+                ? "bg-black text-white"
+                : "hover:bg-sidebar"
+            )}
           >
             <Italic size={16} />
-          </Button>
+          </Toggle>
         </TooltipTrigger>
         <TooltipContent>Italic</TooltipContent>
       </Tooltip>
@@ -99,14 +71,19 @@ export function MenuBar({ editor }: MenuBarProps) {
       {/* Strikethrough */}
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            type="button"
+          <Toggle
             size="sm"
-            variant={active.strike ? "default" : "outline"}
-            onClick={() => editor.chain().focus().toggleStrike().run()}
+            pressed={editor.isActive("strike")}
+            onPressedChange={() => editor.chain().focus().toggleStrike().run()}
+            className={cn(
+              "rounded-sm p-1 transition",
+              editor.isActive("strike")
+                ? "bg-black text-white"
+                : "hover:bg-sidebar"
+            )}
           >
             <Strikethrough size={16} />
-          </Button>
+          </Toggle>
         </TooltipTrigger>
         <TooltipContent>Strikethrough</TooltipContent>
       </Tooltip>
@@ -114,16 +91,21 @@ export function MenuBar({ editor }: MenuBarProps) {
       {/* Heading 1 */}
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            type="button"
+          <Toggle
             size="sm"
-            variant={active.h1 ? "default" : "outline"}
-            onClick={() =>
+            pressed={editor.isActive("heading", { level: 1 })}
+            onPressedChange={() =>
               editor.chain().focus().toggleHeading({ level: 1 }).run()
             }
+            className={cn(
+              "rounded-sm p-1 transition",
+              editor.isActive("heading", { level: 1 })
+                ? "bg-black text-white"
+                : "hover:bg-sidebar"
+            )}
           >
             <Heading1 size={16} />
-          </Button>
+          </Toggle>
         </TooltipTrigger>
         <TooltipContent>Heading 1</TooltipContent>
       </Tooltip>
@@ -131,16 +113,42 @@ export function MenuBar({ editor }: MenuBarProps) {
       {/* Heading 2 */}
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            type="button"
+          <Toggle
             size="sm"
-            variant={active.h2 ? "default" : "outline"}
-            onClick={() =>
+            pressed={editor.isActive("heading", { level: 2 })}
+            onPressedChange={() =>
               editor.chain().focus().toggleHeading({ level: 2 }).run()
             }
+            className={cn(
+              "rounded-sm p-1 transition",
+              editor.isActive("heading", { level: 2 })
+                ? "bg-black text-white"
+                : "hover:bg-sidebar"
+            )}
           >
             <Heading2 size={16} />
-          </Button>
+          </Toggle>
+        </TooltipTrigger>
+        <TooltipContent>Heading 2</TooltipContent>
+      </Tooltip>
+      {/* Heading 3 */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Toggle
+            size="sm"
+            pressed={editor.isActive("heading", { level: 3 })}
+            onPressedChange={() =>
+              editor.chain().focus().toggleHeading({ level: 2 }).run()
+            }
+            className={cn(
+              "rounded-sm p-1 transition",
+              editor.isActive("heading", { level: 3 })
+                ? "bg-black text-white"
+                : "hover:bg-sidebar"
+            )}
+          >
+            <Heading3 size={16} />
+          </Toggle>
         </TooltipTrigger>
         <TooltipContent>Heading 2</TooltipContent>
       </Tooltip>
@@ -148,14 +156,21 @@ export function MenuBar({ editor }: MenuBarProps) {
       {/* Bullet List */}
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            type="button"
+          <Toggle
             size="sm"
-            variant={active.bulletList ? "default" : "outline"}
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
+            pressed={editor.isActive("bulletList")}
+            onPressedChange={() =>
+              editor.chain().focus().toggleBulletList().run()
+            }
+            className={cn(
+              "rounded-sm p-1 transition",
+              editor.isActive("bulletList")
+                ? "bg-black text-white"
+                : "hover:bg-sidebar"
+            )}
           >
             <List size={16} />
-          </Button>
+          </Toggle>
         </TooltipTrigger>
         <TooltipContent>Bullet List</TooltipContent>
       </Tooltip>
@@ -163,14 +178,21 @@ export function MenuBar({ editor }: MenuBarProps) {
       {/* Ordered List */}
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            type="button"
+          <Toggle
             size="sm"
-            variant={active.orderedList ? "default" : "outline"}
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            pressed={editor.isActive("orderedList")}
+            onPressedChange={() =>
+              editor.chain().focus().toggleOrderedList().run()
+            }
+            className={cn(
+              "rounded-sm p-1 transition",
+              editor.isActive("orderedList")
+                ? "bg-black text-white"
+                : "hover:bg-sidebar"
+            )}
           >
             <ListOrdered size={16} />
-          </Button>
+          </Toggle>
         </TooltipTrigger>
         <TooltipContent>Ordered List</TooltipContent>
       </Tooltip>
