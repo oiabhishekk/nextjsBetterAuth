@@ -162,7 +162,7 @@ export default function CourseCreate() {
                         placeholder="Briefly describe your course"
                         {...field}
                       /> */}
-                      {<RichTextEditor />}
+                      <RichTextEditor field={field} />
                     </FormControl>
 
                     <FormMessage />
