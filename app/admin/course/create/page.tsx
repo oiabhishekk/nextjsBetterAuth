@@ -37,6 +37,7 @@ import Link from "next/link";
 import { ArrowLeft, Sparkle } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import RichTextEditor from "@/components/rich-text-editor/Editor";
+import MediaDropZone from "@/components/dropZone/media-drop-zone";
 
 export default function CourseCreate() {
   const form = useForm<CourseFormSchemaType>({
@@ -178,7 +179,8 @@ export default function CourseCreate() {
                   <FormItem>
                     <FormLabel>File Key</FormLabel>
                     <FormControl>
-                      <Input placeholder="thumbnail url" {...field} />
+                      {/* <Input placeholder="thumbnail url" {...field} /> */}
+                      <MediaDropZone />
                     </FormControl>
 
                     <FormMessage />
