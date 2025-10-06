@@ -3,7 +3,6 @@
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Loader2, RotateCcw, UploadCloud, X, XCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Card, CardContent } from "../ui/card";
 
 /**
@@ -100,7 +99,7 @@ export function UploadedState({ file, onRemove, onRetry }:  {
   const previewUrl = URL.createObjectURL(file)
 
   return (
-    <Card className="relative flex h-64 w-full items-center justify-center overflow-hidden rounded-xl border">
+    <Card className="relative flex p-1 h-64 w-full items-center justify-center overflow-hidden rounded-xl border">
       <CardContent className="flex h-full w-full items-center justify-center p-0">
         {isImage && (
           <img
@@ -141,6 +140,7 @@ export function UploadedState({ file, onRemove, onRetry }:  {
         )}
         {onRemove && (
           <Button
+          type="button"
             size="icon"
             variant="destructive"
             onClick={(e) => {

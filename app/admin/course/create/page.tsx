@@ -34,12 +34,18 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
-import { ArrowLeft, Sparkle } from "lucide-react";
+import { ArrowLeft, Loader2, PlusIcon, Sparkle } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import RichTextEditor from "@/components/rich-text-editor/Editor";
 import MediaDropZone from "@/components/dropZone/media-drop-zone";
+import { useTransition } from "react";
+import { CreateCourse } from "./actions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function CourseCreate() {
+  const [isloaded,startTransition]=useTransition()
+  const router = useRouter()
   const form = useForm<CourseFormSchemaType>({
     resolver: zodResolver(courseFormSchema),
     defaultValues: {
@@ -55,11 +61,25 @@ export default function CourseCreate() {
       status: "DRAFT",
     },
   });
+
   function onSubmit(values: CourseFormSchemaType) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-  }
+  startTransition(async () => {
+    const res = await CreateCourse(values);
+
+    if (!res) return;
+
+    if (res.status === "success") {
+      toast.success(res.message || "Course created successfully!");
+      form.reset()
+      router.push("/admin/courses")
+      console.log("Created Course:", res.data);
+    } else {
+      toast.error(res.message || "Error creating course");
+      console.error("CreateCourse Error:", res.errors || res.message);
+    }
+  });
+}
+
   return (
     <>
       <div className="flex justify-between mb-4 gap-4 items-center">
@@ -122,7 +142,7 @@ export default function CourseCreate() {
                   type="button"
                   onClick={() => {
                     const titleValue = form.getValues("title");
-                    form.setValue("slug", slugify(titleValue, "_"));
+                    form.setValue("slug", slugify(titleValue, "-"));
                   }}
                   className="sm:mt-6 w-full sm:w-auto"
                 >
@@ -177,10 +197,13 @@ export default function CourseCreate() {
                 name="fileKey"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>File Key</FormLabel>
+                    <FormLabel>Media</FormLabel>
                     <FormControl>
                       {/* <Input placeholder="thumbnail url" {...field} /> */}
-                      <MediaDropZone />
+                      <MediaDropZone
+          value={field.value}
+          onChange={(value) => field.onChange(value)} // 👈 important
+        />
                     </FormControl>
 
                     <FormMessage />
@@ -335,8 +358,9 @@ export default function CourseCreate() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="">
-                Create Course
+              <Button type="submit" className="" disabled={isloaded}>
+               { isloaded? <>Creating... <Loader2 size={16} className="ml-1 animate-spin" /> </>:<> Create Course <PlusIcon size={16} className="ml-1" />
+                </>}
               </Button>
             </form>
           </Form>

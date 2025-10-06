@@ -17,14 +17,36 @@ export interface ManagedFile {
   progress: number;
   error: boolean;
   isDeleting: boolean;
+  key?: string;
 }
 
-export default function MediaDropZone() {
+export default function MediaDropZone({
+  value,
+  onChange,
+}: {
+  value?: string; // from form field
+  onChange?: (value: string) => void; // updates form field
+}) {
   const [status, setStatus] = useState<
     "normal" | "uploading" | "uploaded" | "failed"
   >("normal");
-
   const [uploadedFile, setUploadedFile] = useState<ManagedFile | null>(null);
+
+  // 🧠 Load existing value from form (useful when editing an existing course)
+  useEffect(() => {
+    if (value && !uploadedFile) {
+      setUploadedFile({
+        id: uuidv4(),
+        uploading: false,
+        progress: 100,
+        error: false,
+        isDeleting: false,
+        key: value,
+        url: `/api/s3/view?key=${value}`, // adjust this if your viewing URL differs
+      });
+      setStatus("uploaded");
+    }
+  }, [value]);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) return;
@@ -46,54 +68,116 @@ export default function MediaDropZone() {
     setStatus("uploading");
 
     try {
-      // Simulate upload progress
-      for (let p = 0; p <= 100; p += 25) {
-        await new Promise((res) => setTimeout(res, 400));
-        setUploadedFile((prev) =>
-          prev ? { ...prev, progress: p } : prev
-        );
-      }
+      // 1️⃣ Get presigned URL
+      const res = await fetch("/api/s3/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fileName: file.name,
+          fileType: file.type,
+          size: file.size,
+        }),
+      });
 
+      if (!res.ok) throw new Error("Failed to get presigned URL");
+
+      const { url: preSignedUrl, key } = await res.json();
+
+      // 2️⃣ Upload with progress tracking
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", preSignedUrl, true);
+        xhr.setRequestHeader("Content-Type", file.type);
+
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const progress = Math.round((event.loaded / event.total) * 100);
+            setUploadedFile((prev) =>
+              prev ? { ...prev, progress } : prev
+            );
+          }
+        };
+
+        xhr.onload = () =>
+          xhr.status >= 200 && xhr.status < 300
+            ? resolve()
+            : reject(new Error(`Upload failed with ${xhr.status}`));
+
+        xhr.onerror = () => reject(new Error("Network error"));
+        xhr.send(file);
+      });
+
+      // ✅ Upload success
       setUploadedFile((prev) =>
-        prev ? { ...prev, uploading: false, progress: 100 } : prev
+        prev ? { ...prev, uploading: false, progress: 100, key } : prev
       );
       setStatus("uploaded");
-    } catch (err) {
+
+      // 🔥 Update form field
+      onChange?.(key);
+
+      toast.success("Upload successful!", {
+        description: `${file.name} uploaded successfully.`,
+      });
+    } catch (err: any) {
+      console.error("Upload failed:", err);
       setUploadedFile((prev) =>
         prev ? { ...prev, uploading: false, error: true } : prev
       );
       setStatus("failed");
+      toast.error("Upload failed", {
+        description: err?.message ?? "Unknown error occurred.",
+      });
     }
   }, []);
 
-  // cleanup object URL when component unmounts or file changes
+  // 🧹 Cleanup
   useEffect(() => {
     return () => {
       if (uploadedFile?.url) URL.revokeObjectURL(uploadedFile.url);
     };
   }, [uploadedFile]);
 
+  // 🗑️ Delete handler
+  const handleRemoveFile = async () => {
+    if (!uploadedFile) return;
+
+    try {
+      if (uploadedFile.key) {
+        const res = await fetch("/api/s3/delete", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key: uploadedFile.key }),
+        });
+
+        if (!res.ok) throw new Error("Failed to delete file on server");
+        toast.success("Media deleted");
+      }
+    } catch (err: any) {
+      toast.error("Could not delete file", { description: err.message });
+      console.error(err);
+    }
+
+    if (uploadedFile.url) URL.revokeObjectURL(uploadedFile.url);
+    setUploadedFile(null);
+    setStatus("normal");
+    onChange?.(""); // clear form field
+  };
+
+  // 🧲 Dropzone setup
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: { "image/*": [], "video/*": [] },
     multiple: false,
     maxFiles: 1,
-    maxSize: 5 * 1024 * 1024, // 5MB
+    maxSize: 5 * 1024 * 1024,
     onDropRejected: (rejections) => {
       rejections.forEach((rej) => {
         rej.errors.forEach((err) => {
           if (err.code === "file-invalid-type") {
-            toast.error("Unsupported file type", {
-              description: "Only images and videos are allowed.",
-              duration: 4000,
-            });
+            toast.error("Unsupported file type");
           } else if (err.code === "file-too-large") {
-            toast.error("File too large", {
-              description: "The file exceeds the 5MB limit.",
-              duration: 4000,
-            });
-          } else {
-            toast.error("Upload failed", { description: err.code });
+            toast.error("File too large (max 5MB)");
           }
         });
       });
@@ -110,7 +194,7 @@ export default function MediaDropZone() {
           : "border-border hover:border-primary/60"
       )}
     >
-      <CardContent className="flex flex-col items-center justify-center gap-3 p-6">
+      <CardContent className="flex flex-col items-center justify-center gap-3 p-1">
         <input {...getInputProps()} />
 
         {status === "normal" && <NormalState isDragActive={isDragActive} />}
@@ -118,21 +202,15 @@ export default function MediaDropZone() {
         {status === "uploading" && uploadedFile && (
           <UploadingState
             progress={uploadedFile.progress}
-            onCancel={() => {
-              setStatus("normal");
-              setUploadedFile(null);
-            }}
+            onCancel={handleRemoveFile}
           />
         )}
 
         {status === "uploaded" && uploadedFile && (
-          <>
-            <CheckCircle2 className="h-10 w-10 text-green-600" />
-            <p className="text-sm font-medium text-green-600">
-              {uploadedFile.file?.name} uploaded successfully!
-            </p>
-            <UploadedState file={uploadedFile.file} />
-          </>
+          <UploadedState
+            file={uploadedFile.file}
+            onRemove={handleRemoveFile}
+          />
         )}
 
         {status === "failed" && (
