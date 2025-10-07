@@ -69,9 +69,10 @@ export default function CourseCreate() {
     if (!res) return;
 
     if (res.status === "success") {
-      toast.success(res.message || "Course created successfully!");
-      form.reset()
       router.push("/admin/courses")
+      form.reset()
+      toast.success(res.message || "Course created successfully!");
+
       console.log("Created Course:", res.data);
     } else {
       toast.error(res.message || "Error creating course");
