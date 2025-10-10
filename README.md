@@ -56,7 +56,7 @@ A modern, full-featured Learning Management System built with **Next.js 15**, **
 
 1. **Clone the repository**
   ```bash
-  git clone https://github.com/yourusername/lms.git
+  git clone https://github.com/oiabhishekk/lms.git
   cd lms
   ```
 
