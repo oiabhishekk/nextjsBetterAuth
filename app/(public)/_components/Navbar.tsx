@@ -27,7 +27,6 @@ const navigationItems = [
 
 export function Navbar() {
   const { data: session, isPending } = authClient.useSession();
-  console.log(session);
   return (
     <header className="w-full sticky top-0 z-50 border-b bg-background/90 backdrop-blur-[backdrop-filter]:bg-background/60  ">
       <div className=" p-4 container flex min-h-16 items-center mx-auto px-4 md:px-6 lg:px-8">

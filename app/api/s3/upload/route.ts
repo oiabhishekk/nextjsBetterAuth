@@ -6,6 +6,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "@/lib/env";
 import { z } from "zod";
+import { requireAdmin } from "@/app/data/admin/require-admin";
 
 // Zod schema for upload request
 const uploadSchema = z.object({
@@ -20,6 +21,7 @@ const uploadSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  await requireAdmin()
   const body = await req.json();
 
   // validate input safely
@@ -34,6 +36,7 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
+  const session = await requireAdmin()
   try {
 
 

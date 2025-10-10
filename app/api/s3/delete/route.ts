@@ -4,12 +4,14 @@ import { NextResponse } from "next/server";
 import { s3 } from "@/lib/s3";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { z } from "zod";
+import { requireAdmin } from "@/app/data/admin/require-admin";
 
 const deleteSchema = z.object({
   key: z.string().min(1),
 });
 
 export async function DELETE(req: Request) {
+  await requireAdmin()
   const body = await req.json();
   const parsed = deleteSchema.safeParse(body);
 

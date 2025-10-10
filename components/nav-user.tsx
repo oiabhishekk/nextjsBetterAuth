@@ -1,10 +1,8 @@
 "use client";
 
 import {
-  IconCreditCard,
   IconDotsVertical,
   IconLogout,
-  IconNotification,
   IconUserCircle,
 } from "@tabler/icons-react";
 
@@ -34,9 +32,11 @@ export function NavUser() {
   const { isMobile } = useSidebar();
   const { data: session, isPending } = authClient.useSession();
   console.log(session, isPending);
-  if (isPending) {
-    return null;
-  }
+  
+  if (isPending || !session) {
+  return null;
+}
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>

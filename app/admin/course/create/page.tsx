@@ -44,6 +44,8 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 export default function CourseCreate() {
+    
+
   const [isloaded,startTransition]=useTransition()
   const router = useRouter()
   const form = useForm<CourseFormSchemaType>({
@@ -63,8 +65,11 @@ export default function CourseCreate() {
   });
 
   function onSubmit(values: CourseFormSchemaType) {
+    console.log(values)
+
   startTransition(async () => {
     const res = await CreateCourse(values);
+    
 
     if (!res) return;
 
@@ -143,7 +148,7 @@ export default function CourseCreate() {
                   type="button"
                   onClick={() => {
                     const titleValue = form.getValues("title");
-                    form.setValue("slug", slugify(titleValue, "-"));
+                    form.setValue("slug", slugify(titleValue, "-").toLowerCase());
                   }}
                   className="sm:mt-6 w-full sm:w-auto"
                 >
@@ -283,7 +288,7 @@ export default function CourseCreate() {
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Price</FormLabel>
+                      <FormLabel>Price in INR</FormLabel>
                       <FormControl>
                         <Input
                           className="w-full"

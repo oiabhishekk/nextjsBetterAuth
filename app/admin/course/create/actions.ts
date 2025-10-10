@@ -3,16 +3,13 @@
 import { prisma } from "@/lib/prisma";
 import { courseFormSchema, CourseFormSchemaType } from "@/lib/zod-schema";
 import type { ActionResponse } from "@/lib/types"; // we’ll define this below
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { requireAdmin } from "@/app/data/admin/require-admin";
 
 export async function CreateCourse(
   values: CourseFormSchemaType
 ): Promise<ActionResponse<{ id: string }>> {
   // 1️⃣ Validate input using Zod
-  const session = await auth.api.getSession({
-    headers: await headers()
-  })
+  const session = await requireAdmin()
   const parsed = courseFormSchema.safeParse(values);
 
   if (!parsed.success) {
@@ -29,7 +26,7 @@ export async function CreateCourse(
       message: "User session not found or user is not authenticated.",
     };
   }
-  
+
   try {
     // 2️⃣ Create record in DB
     const course = await prisma.course.create({
