@@ -4,11 +4,19 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function Login() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  if (session) {
-    redirect("/");
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (session) {
+      redirect("/");
+    }
+
+    return <LoginForm />;
+  } catch (error) {
+    console.error("Error fetching session:", error);
+    // Optionally, you can render an error UI
+    return <LoginForm />;
   }
-  return <LoginForm />;
 }

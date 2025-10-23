@@ -1,30 +1,23 @@
 import { z } from "zod";
 
 // Enums
-export const LevelEnum = z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]);
-export const StatusEnum = z.enum(["DRAFT", "PUBLIC", "ARCHIVE"]);
-export const CourseCategoriesEnum = z.enum([
-  "Business",
-  "Development",
-  "Design",
-  "Marketing",
-  "Finance & Accounting",
-  "IT & Software",
-  "Personal Development",
-  "Photography & Video",
-  "Music",
-  "Health & Fitness",
-  "Lifestyle",
-  "Teaching & Academics",
-  "Science",
-  "Engineering",
-  "Data Science",
-  "Artificial Intelligence",
-  "Cybersecurity",
-  "Language Learning",
-  "Arts & Humanities",
-  "Writing & Content Creation","Others"
-] as const );
+import { Category,Status,Level } from './generated/prisma/index.d';
+
+// for server
+// Optional: export as Zod enums
+import { STATIC_ENUMS } from "./types";
+
+export const LevelEnum = z.enum(STATIC_ENUMS.Level);
+export const StatusEnum = z.enum(STATIC_ENUMS.Status);
+export const CourseCategoriesEnum = z.enum(STATIC_ENUMS.Category);
+//for types 
+export type CourseCategoriesEnumType = z.infer<typeof CourseCategoriesEnum>;
+export type StatusEnumType = z.infer<typeof StatusEnum>;
+export type LevelEnumType = z.infer<typeof LevelEnum>;
+//for options write 3 more exports
+export const LevelOptions = LevelEnum.options; // ["BEGINNER", "INTERMEDIATE", "ADVANCED"]
+export const StatusOptions = StatusEnum.options; // ["DRAFT", "PUBLIC", "ARCHIVE"]
+export const CourseCategoryOptions = CourseCategoriesEnum.options; 
 
 
 export const courseFormSchema = z.object({

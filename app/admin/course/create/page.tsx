@@ -27,9 +27,9 @@ import {
 import {
   courseFormSchema,
   CourseFormSchemaType,
-  StatusEnum,
-  CourseCategoriesEnum,
-  LevelEnum,
+  LevelOptions,
+  StatusOptions,
+  CourseCategoryOptions,
 } from "@/lib/zod-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -44,10 +44,8 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 export default function CourseCreate() {
-    
-
-  const [isloaded,startTransition]=useTransition()
-  const router = useRouter()
+  const [isloaded, startTransition] = useTransition();
+  const router = useRouter();
   const form = useForm<CourseFormSchemaType>({
     resolver: zodResolver(courseFormSchema),
     defaultValues: {
@@ -57,7 +55,7 @@ export default function CourseCreate() {
       fileKey: "",
       price: 0,
       duration: 1,
-      category: "Others",
+      category: "OTHERS",
       slug: "",
       level: "BEGINNER",
       status: "DRAFT",
@@ -65,26 +63,25 @@ export default function CourseCreate() {
   });
 
   function onSubmit(values: CourseFormSchemaType) {
-    console.log(values)
+    console.log(values);
 
-  startTransition(async () => {
-    const res = await CreateCourse(values);
-    
+    startTransition(async () => {
+      const res = await CreateCourse(values);
 
-    if (!res) return;
+      if (!res) return;
 
-    if (res.status === "success") {
-      router.push("/admin/courses")
-      form.reset()
-      toast.success(res.message || "Course created successfully!");
+      if (res.status === "success") {
+        router.push("/admin/courses");
+        form.reset();
+        toast.success(res.message || "Course created successfully!");
 
-      console.log("Created Course:", res.data);
-    } else {
-      toast.error(res.message || "Error creating course");
-      console.error("CreateCourse Error:", res.errors || res.message);
-    }
-  });
-}
+        console.log("Created Course:", res.data);
+      } else {
+        toast.error(res.message || "Error creating course");
+        console.error("CreateCourse Error:", res.errors || res.message);
+      }
+    });
+  }
 
   return (
     <>
@@ -148,7 +145,10 @@ export default function CourseCreate() {
                   type="button"
                   onClick={() => {
                     const titleValue = form.getValues("title");
-                    form.setValue("slug", slugify(titleValue, "-").toLowerCase());
+                    form.setValue(
+                      "slug",
+                      slugify(titleValue, "-").toLowerCase()
+                    );
                   }}
                   className="sm:mt-6 w-full sm:w-auto"
                 >
@@ -207,9 +207,9 @@ export default function CourseCreate() {
                     <FormControl>
                       {/* <Input placeholder="thumbnail url" {...field} /> */}
                       <MediaDropZone
-          value={field.value}
-          onChange={(value) => field.onChange(value)} // 👈 important
-        />
+                        value={field.value}
+                        onChange={(value) => field.onChange(value)} // 👈 important
+                      />
                     </FormControl>
 
                     <FormMessage />
@@ -234,7 +234,7 @@ export default function CourseCreate() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {CourseCategoriesEnum.options.map((category) => (
+                          {CourseCategoryOptions.map((category) => (
                             <SelectItem key={category} value={category}>
                               {category}
                             </SelectItem>
@@ -265,7 +265,7 @@ export default function CourseCreate() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {LevelEnum.options.map((level) => (
+                          {LevelOptions.map((level) => (
                             <SelectItem key={level} value={level}>
                               {level}
                             </SelectItem>
@@ -352,7 +352,7 @@ export default function CourseCreate() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {StatusEnum.options.map((status) => (
+                        {StatusOptions.map((status) => (
                           <SelectItem key={status} value={status}>
                             {status}
                           </SelectItem>
@@ -365,8 +365,17 @@ export default function CourseCreate() {
                 )}
               />
               <Button type="submit" className="" disabled={isloaded}>
-               { isloaded? <>Creating... <Loader2 size={16} className="ml-1 animate-spin" /> </>:<> Create Course <PlusIcon size={16} className="ml-1" />
-                </>}
+                {isloaded ? (
+                  <>
+                    Creating...{" "}
+                    <Loader2 size={16} className="ml-1 animate-spin" />{" "}
+                  </>
+                ) : (
+                  <>
+                    {" "}
+                    Create Course <PlusIcon size={16} className="ml-1" />
+                  </>
+                )}
               </Button>
             </form>
           </Form>

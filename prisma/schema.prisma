@@ -97,7 +97,7 @@ model Course {
   duration         Int // duration in minutes or hours
   level            Level    @default(BEGINNER)
   status           Status   @default(DRAFT)
-  category         String
+  category         Category @default(OTHERS)
   slug             String   @unique @map("category_slug")
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
@@ -116,4 +116,28 @@ enum Status {
   DRAFT
   PUBLIC
   ARCHIVE
+}
+
+enum Category {
+  BUSINESS
+  DEVELOPMENT
+  DESIGN
+  MARKETING
+  FINANCE_ACCOUNTING
+  IT_SOFTWARE
+  PERSONAL_DEVELOPMENT
+  PHOTOGRAPHY_VIDEO
+  MUSIC
+  HEALTH_FITNESS
+  LIFESTYLE
+  TEACHING_ACADEMICS
+  SCIENCE
+  ENGINEERING
+  DATA_SCIENCE
+  AI
+  CYBERSECURITY
+  LANGUAGE_LEARNING
+  ARTS_HUMANITIES
+  WRITING_CONTENT
+  OTHERS
 }

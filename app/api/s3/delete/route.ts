@@ -29,7 +29,8 @@ export async function DELETE(req: Request) {
     }));
     console.log("phdeteetettete")
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (e) {
+    console.log(e)
     return NextResponse.json(
       { success: false, error: "Failed to delete file" },
       { status: 500 }

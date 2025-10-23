@@ -1,11 +1,9 @@
 "use client";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -31,7 +29,7 @@ export function LoginForm() {
           onSuccess: () => {
             toast.success("Logged in successfully, You'll be redirected"); // redirect to login page
           },
-          onError: (e) => {
+          onError: () => {
             toast.error("Internal server Error");
           },
         },

@@ -6,7 +6,6 @@ import { requireAdmin } from "@/app/data/admin/require-admin";
 
 // ----- Function -----
 export async function adminGetCourses() {
-
   await requireAdmin();
 
   try {
@@ -19,6 +18,7 @@ export async function adminGetCourses() {
         title: true,
         description: true,
         smallDescription: true,
+        category: true,
         duration: true,
         level: true,
         status: true,
@@ -27,13 +27,11 @@ export async function adminGetCourses() {
         slug: true,
       },
     });
-    console.log("data",data)
-return data
+    return data;
   } catch (error) {
     console.error("Error fetching admin courses:", error);
   }
-    return []
-
+  return [];
 }
 // Full return type (array of courses)
 export type AdminGetCoursesReturn = Awaited<ReturnType<typeof adminGetCourses>>;

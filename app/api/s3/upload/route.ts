@@ -36,11 +36,11 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-  const session = await requireAdmin()
+  
   try {
 
 
-    const { fileName, fileType, size } = parsed.data;
+    const { fileName, fileType } = parsed.data;
     const key = `uploads/${Date.now()}-${fileName}`
     const command = new PutObjectCommand({
       Bucket: env.NEXT_PUBLIC_AWS_BUCKET_NAME,
@@ -54,7 +54,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, url, key });
   }
-  catch (error) {
+  catch (e) {
+    console.log(e)
+
     NextResponse.json({
       error: "Failed to Generate Presigned Url"
     }, {
