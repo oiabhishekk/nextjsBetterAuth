@@ -1,4 +1,5 @@
+import { redirect } from "next/navigation";
+
 export default function Courses() {
-  
-  return <h1>Hellllo im from page</h1>;
+  redirect("/dashboard");
 }

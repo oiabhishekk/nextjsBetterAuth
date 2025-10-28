@@ -2,16 +2,21 @@
 
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Loader2, RotateCcw, UploadCloud, X, XCircle } from "lucide-react";
+import {
+  CheckCircle2,
+  Loader2,
+  RotateCcw,
+  UploadCloud,
+  X,
+  XCircle,
+} from "lucide-react";
 import { Card, CardContent } from "../ui/card";
 
 /**
  * Normal (idle) uploader state
  */
 
-
-
-export function NormalState({ isDragActive }: {isDragActive: boolean;}) {
+export function NormalState({ isDragActive }: { isDragActive: boolean }) {
   return (
     <>
       <UploadCloud className="h-10 w-10 text-muted-foreground" />
@@ -31,11 +36,13 @@ export function NormalState({ isDragActive }: {isDragActive: boolean;}) {
   );
 }
 
-
 /**
  * Uploading state
  */
-export function UploadingState({ progress, onCancel }: {
+export function UploadingState({
+  progress,
+  onCancel,
+}: {
   progress?: number; // 0-100
   onCancel?: () => void;
 }) {
@@ -69,7 +76,7 @@ export function UploadingState({ progress, onCancel }: {
           onClick={(e) => {
             e.stopPropagation(); // 🚫 stops dropzone click
             onCancel();
-    }}
+          }}
         >
           Cancel
         </Button>
@@ -82,22 +89,24 @@ export function UploadingState({ progress, onCancel }: {
  * Uploaded state (success)
  */
 
-
-
-
-export function UploadedState({ file, onRemove, onRetry }:  {
-  file: File | undefined
-  onRemove?: () => void
-  onRetry?: () => void
+export function UploadedState({
+  file,
+  onRemove,
+  onRetry,
+}: {
+  file: File | undefined;
+  onRemove?: () => void;
+  onRetry?: () => void;
 }) {
-  if(!file){
-    return
+  if (!file) {
+    return;
   }
-  const isImage = file.type.startsWith("image/")
-  const isVideo = file.type.startsWith("video/")
+  const isImage = file.type.startsWith("image/");
+  const isVideo = file.type.startsWith("video/");
 
-  const previewUrl = URL.createObjectURL(file)
-
+  const previewUrl = URL.createObjectURL(file);
+  console.log("previewUrl");
+  console.log(previewUrl);
   return (
     <Card className="relative flex p-1 h-64 w-full items-center justify-center overflow-hidden rounded-xl border">
       <CardContent className="flex h-full w-full items-center justify-center p-0">
@@ -130,8 +139,8 @@ export function UploadedState({ file, onRemove, onRetry }:  {
             size="icon"
             variant="outline"
             onClick={(e) => {
-              e.stopPropagation()
-              onRetry()
+              e.stopPropagation();
+              onRetry();
             }}
             className="rounded-full bg-background/80 backdrop-blur"
           >
@@ -140,12 +149,12 @@ export function UploadedState({ file, onRemove, onRetry }:  {
         )}
         {onRemove && (
           <Button
-          type="button"
+            type="button"
             size="icon"
             variant="destructive"
             onClick={(e) => {
-              e.stopPropagation()
-              onRemove()
+              e.stopPropagation();
+              onRemove();
             }}
             className="rounded-full bg-background/80 backdrop-blur"
           >
@@ -154,9 +163,8 @@ export function UploadedState({ file, onRemove, onRetry }:  {
         )}
       </div>
     </Card>
-  )
+  );
 }
-
 
 /**
  * Failed state

@@ -34,12 +34,17 @@ import RichTextEditor from "@/components/rich-text-editor/Editor";
 import MediaDropZone from "@/components/dropZone/media-drop-zone";
 import { useTransition } from "react";
 import { AdminGetSingleCourseTypes } from "@/app/data/admin/admin-get-course";
+import { UpdateCourse } from "../action";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 interface iAppProp {
   data: AdminGetSingleCourseTypes;
+  courseId: string;
 }
 
-export default function CourseCreate({ data }: iAppProp) {
+export default function CourseCreate({ data, courseId }: iAppProp) {
   const [isloaded, startTransition] = useTransition();
+  const router = useRouter();
 
   const form = useForm<CourseFormSchemaType>({
     resolver: zodResolver(courseFormSchema),
@@ -57,8 +62,25 @@ export default function CourseCreate({ data }: iAppProp) {
     },
   });
 
-  function onSubmit(values: CourseFormSchemaType) {
+  function onSubmit(values: CourseFormSchemaType & { id?: string }) {
     console.log(values);
+    startTransition(async () => {
+      values.id = courseId;
+      const res = await UpdateCourse(values);
+
+      if (!res) return;
+
+      if (res.status === "success") {
+        router.push("/admin/courses");
+        form.reset();
+        toast.success(res.message || "Course created successfully!");
+
+        console.log("Created Course:", res.data);
+      } else {
+        toast.error(res.message || "Error creating course");
+        console.error("CreateCourse Error:", res.errors || res.message);
+      }
+    });
   }
 
   return (
@@ -157,7 +179,7 @@ export default function CourseCreate({ data }: iAppProp) {
             name="fileKey"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Media</FormLabel>
+                <FormLabel>want update new picture? update it here</FormLabel>
                 <FormControl>
                   {/* <Input placeholder="thumbnail url" {...field} /> */}
                   <MediaDropZone
@@ -317,12 +339,12 @@ export default function CourseCreate({ data }: iAppProp) {
           <Button type="submit" className="" disabled={isloaded}>
             {isloaded ? (
               <>
-                Creating... <Loader2 size={16} className="ml-1 animate-spin" />{" "}
+                Updating... <Loader2 size={16} className="ml-1 animate-spin" />{" "}
               </>
             ) : (
               <>
                 {" "}
-                Create Course <PlusIcon size={16} className="ml-1" />
+                Update Course <PlusIcon size={16} className="ml-1" />
               </>
             )}
           </Button>

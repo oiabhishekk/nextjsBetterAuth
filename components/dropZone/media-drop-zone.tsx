@@ -8,6 +8,7 @@ import { CheckCircle2, XCircle } from "lucide-react";
 import { NormalState, UploadedState, UploadingState } from "./UploaderStatesUi";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
+import { env } from "@/lib/env";
 
 export interface ManagedFile {
   id: string;
@@ -30,9 +31,13 @@ export default function MediaDropZone({
   const [status, setStatus] = useState<
     "normal" | "uploading" | "uploaded" | "failed"
   >("normal");
+  console.log("value");
+  console.log(value);
   const [uploadedFile, setUploadedFile] = useState<ManagedFile | null>(null);
 
   // 🧠 Load existing value from form (useful when editing an existing course)
+  const imageUrl = `https://${"abhi-lms-demo"}.t3.storage.dev/${value}`;
+
   useEffect(() => {
     if (value && !uploadedFile) {
       setUploadedFile({
@@ -42,7 +47,7 @@ export default function MediaDropZone({
         error: false,
         isDeleting: false,
         key: value,
-        url: `/api/s3/view?key=${value}`, // adjust this if your viewing URL differs
+        url: imageUrl,
       });
       setStatus("uploaded");
     }
@@ -92,9 +97,7 @@ export default function MediaDropZone({
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
             const progress = Math.round((event.loaded / event.total) * 100);
-            setUploadedFile((prev) =>
-              prev ? { ...prev, progress } : prev
-            );
+            setUploadedFile((prev) => (prev ? { ...prev, progress } : prev));
           }
         };
 
@@ -207,10 +210,7 @@ export default function MediaDropZone({
         )}
 
         {status === "uploaded" && uploadedFile && (
-          <UploadedState
-            file={uploadedFile.file}
-            onRemove={handleRemoveFile}
-          />
+          <UploadedState file={uploadedFile.file} onRemove={handleRemoveFile} />
         )}
 
         {status === "failed" && (

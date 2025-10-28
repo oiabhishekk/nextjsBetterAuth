@@ -43,7 +43,7 @@ export default async function EditCoursePage({
               <CardDescription>Edit the Course.</CardDescription>
             </CardHeader>
             <CardContent>
-              <EditCourseForm data={course} />
+              <EditCourseForm data={course} courseId={courseId} />
               {/* Add form fields or content for basic info here */}
             </CardContent>
           </Card>
